@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Tabuleiro</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">br.com.cod3r.cm.modelo</a>
+</div>
+
+<h1>Coverage Summary for Class: Tabuleiro (br.com.cod3r.cm.modelo)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Tabuleiro</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46,7%
+  </span>
+  <span class="absValue">
+    (7/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60,9%
+  </span>
+  <span class="absValue">
+    (28/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package br.com.cod3r.cm.modelo;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;public class Tabuleiro implements CampoObservador {
+&nbsp;
+&nbsp;	private final int linhas;
+&nbsp;	private final int colunas;
+&nbsp;	private final int minas;
+&nbsp;
+<b class="fc">&nbsp;	private final List&lt;Campo&gt; campos = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;	private final List&lt;Consumer&lt;ResultadoEvento&gt;&gt; observadores = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;	public Tabuleiro(int linhas, int colunas, int minas) {</b>
+<b class="fc">&nbsp;		this.linhas = linhas;</b>
+<b class="fc">&nbsp;		this.colunas = colunas;</b>
+<b class="fc">&nbsp;		this.minas = minas;</b>
+&nbsp;
+<b class="fc">&nbsp;		gerarCampos();</b>
+<b class="fc">&nbsp;		associarVizinhos();</b>
+<b class="fc">&nbsp;		sortearMinas();</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public void paraCadaCampo(Consumer&lt;Campo&gt; funcao) {
+<b class="fc">&nbsp;		campos.forEach(funcao);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void registrarObservador(Consumer&lt;ResultadoEvento&gt; observador) {
+<b class="fc">&nbsp;		observadores.add(observador);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void notificarObservadores(boolean resultado) {
+<b class="fc">&nbsp;		observadores.stream().forEach(o -&gt; o.accept(new ResultadoEvento(resultado)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void abrir(int linha, int coluna) {
+<b class="nc">&nbsp;		campos.parallelStream().filter(c -&gt; c.getLinha() == linha &amp;&amp; c.getColuna() == coluna).findFirst()</b>
+<b class="nc">&nbsp;				.ifPresent(c -&gt; c.abrir());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void alternarMarcacao(int linha, int coluna) {
+<b class="nc">&nbsp;		campos.parallelStream().filter(c -&gt; c.getLinha() == linha &amp;&amp; c.getColuna() == coluna).findFirst()</b>
+<b class="nc">&nbsp;				.ifPresent(c -&gt; c.alternarMarcacao());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void gerarCampos() {
+<b class="fc">&nbsp;		for (int linha = 0; linha &lt; linhas; linha++) {</b>
+<b class="fc">&nbsp;			for (int coluna = 0; coluna &lt; colunas; coluna++) {</b>
+<b class="fc">&nbsp;				Campo campo = new Campo(linha, coluna);</b>
+<b class="fc">&nbsp;				campo.registrarObservador(this);</b>
+<b class="fc">&nbsp;				campos.add(campo);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void associarVizinhos() {
+<b class="fc">&nbsp;		for (Campo c1 : campos) {</b>
+<b class="fc">&nbsp;			for (Campo c2 : campos) {</b>
+<b class="fc">&nbsp;				c1.adicionarVizinho(c2);</b>
+<b class="fc">&nbsp;			}</b>
+<b class="fc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void sortearMinas() {
+<b class="fc">&nbsp;		long minasArmadas = 0;</b>
+<b class="fc">&nbsp;		Predicate&lt;Campo&gt; minado = c -&gt; c.isMinado();</b>
+&nbsp;
+&nbsp;		do {
+<b class="fc">&nbsp;			int aleatorio = (int) (Math.random() * campos.size());</b>
+<b class="fc">&nbsp;			campos.get(aleatorio).minar();</b>
+<b class="fc">&nbsp;			minasArmadas = campos.stream().filter(minado).count();</b>
+<b class="fc">&nbsp;		} while (minasArmadas &lt; minas);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean objetivoAlcancado() {
+<b class="nc">&nbsp;		return campos.stream().allMatch(c -&gt; c.objetivoAlcancado());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void reiniciar() {
+<b class="nc">&nbsp;		campos.stream().forEach(c -&gt; c.reiniciar());</b>
+<b class="nc">&nbsp;		sortearMinas();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public int getLinhas() {
+<b class="nc">&nbsp;		return linhas;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public int getColunas() {
+<b class="nc">&nbsp;		return colunas;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void eventoOcorreu(Campo campo, CampoEvento evento) {
+<b class="nc">&nbsp;		if (evento == CampoEvento.EXPLODIR) {</b>
+<b class="nc">&nbsp;			mostrarMinas();</b>
+<b class="nc">&nbsp;			notificarObservadores(false);</b>
+<b class="nc">&nbsp;		} else if (objetivoAlcancado()) {</b>
+<b class="nc">&nbsp;			notificarObservadores(true);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void mostrarMinas() {
+<b class="nc">&nbsp;		campos.stream()</b>
+<b class="nc">&nbsp;			.filter(c -&gt; c.isMinado())</b>
+<b class="nc">&nbsp;			.filter(c -&gt; !c.isMarcado())</b>
+<b class="nc">&nbsp;			.forEach(c -&gt; c.setAberto(true));</b>
+&nbsp;	}
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-21 21:11</div>
+</div>
+</body>
+</html>

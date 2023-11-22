@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Campo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">br.com.cod3r.cm.modelo</a>
+</div>
+
+<h1>Coverage Summary for Class: Campo (br.com.cod3r.cm.modelo)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Campo</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96,7%
+  </span>
+  <span class="absValue">
+    (58/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package br.com.cod3r.cm.modelo;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public class Campo {
+&nbsp;	
+&nbsp;	private final int linha;
+&nbsp;	private final int coluna;
+&nbsp;
+&nbsp;	public List&lt;Campo&gt; getVizinhos() {
+<b class="fc">&nbsp;		return vizinhos;</b>
+&nbsp;	}
+&nbsp;
+<b class="fc">&nbsp;	private boolean aberto = false;</b>
+<b class="fc">&nbsp;	private boolean minado = false;</b>
+<b class="fc">&nbsp;	private boolean marcado = false;</b>
+&nbsp;	
+<b class="fc">&nbsp;	private List&lt;Campo&gt; vizinhos = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;	private List&lt;CampoObservador&gt; observadores = new ArrayList&lt;&gt;();</b>
+&nbsp;	 
+<b class="fc">&nbsp;	public Campo(int linha, int coluna) {</b>
+<b class="fc">&nbsp;		this.linha = linha;</b>
+<b class="fc">&nbsp;		this.coluna = coluna;</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public void registrarObservador(CampoObservador observador) {
+<b class="fc">&nbsp;		observadores.add(observador);</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	private void notificarObservadores(CampoEvento evento) {
+<b class="fc">&nbsp;		observadores.stream()</b>
+<b class="fc">&nbsp;			.forEach(o -&gt; o.eventoOcorreu(this, evento));</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public boolean isMarcado() {
+<b class="fc">&nbsp;		return marcado;</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public boolean isDesmarcado() {
+<b class="fc">&nbsp;		return !isMarcado();</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	void setAberto(boolean aberto) {
+<b class="fc">&nbsp;		this.aberto = aberto;</b>
+&nbsp;		
+<b class="fc">&nbsp;		if(aberto) {</b>
+<b class="fc">&nbsp;			notificarObservadores(CampoEvento.ABRIR);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;	
+&nbsp;	public boolean isAberto() {
+<b class="fc">&nbsp;		return aberto;</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public boolean isFechado() {
+<b class="fc">&nbsp;		return !isAberto();</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public boolean isMinado() {
+<b class="fc">&nbsp;		return minado;</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public boolean isSemMina() {
+<b class="fc">&nbsp;		return !isMinado();</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public int getLinha() {
+<b class="fc">&nbsp;		return linha;</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public int getColuna() {
+<b class="fc">&nbsp;		return coluna;</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	//M?todo para mostrar os vizinhos que n?o tem bomba em volta do campo que foi selecionado.
+&nbsp;	public boolean adicionarVizinho(Campo vizinho) {
+<b class="fc">&nbsp;		boolean linhaDiferente = linha != vizinho.linha;</b>
+<b class="fc">&nbsp;		boolean colunaDiferente = linha != vizinho.coluna;</b>
+<b class="fc">&nbsp;		boolean diagonal = linhaDiferente &amp;&amp; colunaDiferente;</b>
+&nbsp;		
+<b class="fc">&nbsp;		int deltaLinha = Math.abs(linha - vizinho.linha);</b>
+<b class="fc">&nbsp;		int deltaColuna = Math.abs(coluna - vizinho.coluna);</b>
+<b class="fc">&nbsp;		int deltaGeral = deltaColuna + deltaLinha;</b>
+&nbsp;		
+<b class="fc">&nbsp;		if(deltaGeral == 1 &amp;&amp; !diagonal) {</b>
+<b class="fc">&nbsp;			vizinhos.add(vizinho);	</b>
+<b class="fc">&nbsp;			return true;</b>
+<b class="fc">&nbsp;		}else if (deltaGeral == 2 &amp;&amp; diagonal) {</b>
+<b class="fc">&nbsp;			vizinhos.add(vizinho);</b>
+<b class="fc">&nbsp;			return true;</b>
+&nbsp;		}else {
+<b class="fc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}	
+&nbsp;		
+&nbsp;	//Marcar &amp; Desmarcar determinado campo.
+&nbsp;	public void alternarMarcacao() {
+<b class="fc">&nbsp;		if (!aberto) {</b>
+<b class="fc">&nbsp;			marcado = !marcado;</b>
+&nbsp;			
+<b class="fc">&nbsp;			if(marcado) {</b>
+<b class="fc">&nbsp;				notificarObservadores(CampoEvento.MARCAR);</b>
+&nbsp;			}else {
+<b class="fc">&nbsp;				notificarObservadores(CampoEvento.DESMARCAR);</b>
+&nbsp;			}	
+&nbsp;		}
+&nbsp;	}
+&nbsp;	
+&nbsp;	/*
+&nbsp;	 * Se campo n?o estiver aberto e marcado, o campo ent?o ? aberto. 
+&nbsp;	 * Se estiver minado o Jogo ? encerrado. 
+&nbsp;	 * Se a vizinha?a do campo for segura, isso ? n?o tem minas nos campos pr?ximos, 
+&nbsp;	 * ent?o esses campos s?o abertos.
+&nbsp;	 */
+&nbsp;	public boolean abrir() {
+<b class="fc">&nbsp;		if(!aberto &amp;&amp; !marcado) {</b>
+<b class="fc">&nbsp;			if(minado) {</b>
+<b class="nc">&nbsp;				System.out.print(&quot;oi&quot;);</b>
+&nbsp;			}
+&nbsp;
+<b class="fc">&nbsp;			setAberto(true);</b>
+<b class="fc">&nbsp;			notificarObservadores(CampoEvento.ABRIR);</b>
+&nbsp;
+<b class="fc">&nbsp;			if(vizinhancaSegura()) {</b>
+<b class="fc">&nbsp;				vizinhos.forEach(v -&gt; v.abrir());</b>
+&nbsp;			}
+&nbsp;
+<b class="fc">&nbsp;			return true;</b>
+&nbsp;
+<b class="nc">&nbsp;		}else return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	//Verificar se os campos vizinhos s?o seguros para se abrir.
+&nbsp;	public boolean vizinhancaSegura() {
+<b class="fc">&nbsp;		return vizinhos.stream().noneMatch(v -&gt; v.minado);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	//Minar campo passado.
+&nbsp;	public void minar() {
+<b class="fc">&nbsp;		minado = true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	//Verificar se determinado campo foi Desvendado ou est? protegido.
+&nbsp;	public boolean objetivoAlcancado() {
+<b class="fc">&nbsp;		boolean desvendado = !minado &amp;&amp; aberto;</b>
+<b class="fc">&nbsp;		boolean protegido = minado &amp;&amp; marcado;</b>
+<b class="fc">&nbsp;		return desvendado || protegido;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	//Contas quantas minas tem em volta da jogada feita.
+&nbsp;	public int minasNaVizinhanca() {
+<b class="fc">&nbsp;		return (int)vizinhos.stream().filter(v -&gt; v.minado).count();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	//Reiniciar campos do jogo.
+&nbsp;	public void reiniciar() {
+<b class="fc">&nbsp;		aberto = false;</b>
+<b class="fc">&nbsp;		minado = false;</b>
+<b class="fc">&nbsp;		marcado = false;</b>
+<b class="fc">&nbsp;		notificarObservadores(CampoEvento.REINICIAR);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-11-21 21:11</div>
+</div>
+</body>
+</html>
